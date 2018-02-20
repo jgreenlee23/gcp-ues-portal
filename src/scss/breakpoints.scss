@@ -1,0 +1,73 @@
+
+// breakpoints
+$mobile: (
+  columns: 6,
+  gutter: 24px,
+  media: 768px
+);
+
+$desktop: (
+  columns: 12,
+  gutter: 32px,
+  media: 1200px
+);
+
+
+@mixin span-column($columns: null, $grid: $neat-grid) {
+  // $columns
+}
+body {
+  @include grid-container;
+  @include grid-media($mobile) {
+    @include grid-visual(cyan, $mobile);
+  }
+  
+  @include grid-media($desktop) {
+    @include grid-visual(skyblue, $desktop);
+  }
+}
+
+body {
+  margin: 0px;
+}
+
+// $breakpoints: (
+//     small: 320px,  // phone: 
+//     medium: 600px, // tablet: 600px (Kindle Fire), 720px (Surface), 768px (iPad)
+//     large: 768px,
+//     xlarge: 1020px,
+//     xxlarge: 1360px,
+//     xxxlarge: 1920px
+// );
+// 
+// // Respond-To Mixin
+// @mixin respond-to($breakpoint) {
+//     @if map-has-key($breakpoints, $breakpoint) {
+//         $value: map-get($breakpoints, $breakpoint);
+// 
+//         @media screen and (min-width: $value) {
+//             @content;
+//         }
+//     }
+// 
+//     @warn "Unknown `#{$breakpoint}` in $breakpoints";
+// }
+
+// @import './node_modules/bourbon-neat/app/assets/stylesheets/_neat-helpers';
+// 
+// $first-breakpoint-value: 400px;
+// $second-breakpoint-value: 835px;
+// $third-breakpoint-value: 1100px;
+// 
+// // Covers 0-399px wide screen size. 2 column grid
+// $small-screen: new-breakpoint(max-width em($first-breakpoint-value — 1) 2);
+// // Covers 400-835px wide screen size. 4 column grid
+// $medium-screen: new-breakpoint(min-width em($first-breakpoint-value) max-width em($second-breakpoint-value) 4);
+// // Covers 836-1099px wide screen size. 8 column grid
+// $large-screen: new-breakpoint(min-width em($second-breakpoint-value + 1) max-width em($third-breakpoint-value — 1) 8);
+// // Covers 1100px and up wide screen size. 12 column grid (default grid size)
+// $xl-screen: new-breakpoint(min-width em($third-breakpoint-value));
+
+// custom breakpoints
+// $tablet: new-breakpoint(max-width 768px 8);
+// $mobile: new-breakpoint(max-width 480px 4);

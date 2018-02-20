@@ -1,0 +1,36 @@
+// src/scss/styles.scss
+
+// @import 'neat';
+// @import 'bourbon';
+
+@import './grid-settings'; // custom grid-settings must be loaded BEFORE neat
+@import './node_modules/bourbon-neat/core/_neat';
+@import './node_modules/bourbon/core/_bourbon';
+
+@import './variables';
+@import './mixins';
+@import './breakpoints';
+
+// breakpoints
+$my-desktop-grid: (
+  columns: 12,
+  gutter: 32px,
+  media: 1200px
+);
+
+$my-mobile-grid: (
+  columns: 6,
+  gutter: 24px,
+  media: 768px
+);
+
+body {
+  @include grid-container;
+  @include grid-media($my-mobile-grid) {
+    @include grid-visual(cyan, $my-mobile-grid);
+  }
+  
+  @include grid-media($my-desktop-grid) {
+    @include grid-visual(skyblue, $my-desktop-grid);
+  }
+}

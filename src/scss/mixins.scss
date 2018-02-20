@@ -1,0 +1,78 @@
+// src/scss/mixins.scss
+@mixin keyframes($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-ms-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+@mixin animation($str) {
+  -webkit-animation: #{$str};
+  -moz-animation: #{$str};
+  -ms-animation: #{$str};
+  -o-animation: #{$str};
+  animation: #{$str};
+}
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+@mixin transform($t) {
+  -ms-transform: $t;
+  -webkit-transform: $t;
+  transform: $t;
+}
+@mixin surface($stickyheight) {
+  min-height: 100%;
+  margin: 0 auto -$stickyheight;
+}
+@mixin push($height) {
+  height: $height;
+}
+@mixin sticky($height) {
+  position: relative;
+  margin-top: -$height;
+  height: $height;
+  clear: both;
+}
+@mixin cover($url) {
+  background: url($url) no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+//mixin to prevent highlighting
+@mixin noselect {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+@mixin filter($filter) {
+  -webkit-filter: $filter;
+  filter: $filter;
+}
+@mixin paper($weight) {
+    box-shadow: 0 0 5px rgba(0, 0, 0, $weight),
+}
+
+// Neat Aliases
+@mixin span-columns($cnt) {
+  @include grid-column($cnt);
+}
