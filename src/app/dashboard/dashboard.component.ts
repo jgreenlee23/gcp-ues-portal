@@ -17,7 +17,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private getDatasets() {
-    this.bigqueryService.listDatasets().subscribe(datasets => this.datasets = datasets);
-    console.log(this.datasets);
+    // this.bigqueryService.listDatasets().subscribe(datasets => this.datasets = datasets);
+    // console.log(this.datasets);
   }
 }
