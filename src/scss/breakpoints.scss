@@ -12,6 +12,7 @@ $desktop: (
   media: 1200px
 );
 
+// TODO: overwrite $neat-grid with $desktop (defaulting to 12 column layout)
 
 @mixin span-column($columns: null, $grid: $neat-grid) {
   // $columns
