@@ -37,8 +37,11 @@
     "express": "4.14.1",
     "gapi-client": "0.0.3",
     "googleapis": "16.1.0",
+    "gulp-sourcemaps": "^2.6.4",
     "jeet": "^7.2.0",
+    "jquery": "^3.3.1",
     "node-neat": "^2.0.0-beta.0",
+    "npm": "^5.7.1",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
