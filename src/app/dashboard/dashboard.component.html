@@ -25,17 +25,21 @@
   <div class="box d">D</div>
 </div> -->
 
-<div class="wrapper">
-   <div draggable="true" (dragstart)="onDragStart()">One</div>
-   <div (click)="onClickMe()">Two</div>
-   <div>Three</div>
-   <div>Four</div>
-   <div (drop)="onDrop()" (dragover)="onDragOver()">Five</div>
-   <div>Six</div>
-   <div>Seven</div>
-   <div>Eight</div>
-   <div>Nine</div>
-   <div>Ten</div>
-   <div>Eleven</div>
-   <div>Twelve</div>
+<!-- <div class="wrapper" (drop)="onDrop()" (dragover)="onDragOver()"> -->
+<div class="wrapper edit">
+   <!-- <div draggable="true" (dragstart)="startMove()">One -->
+   <div (mousedown)="startMove()">One
+     <!-- <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1000;"></div> -->
+   </div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Two</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Three</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Four</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Five</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Six</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Seven</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Eight</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Nine</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Ten</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Eleven</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Twelve</div>
 </div>

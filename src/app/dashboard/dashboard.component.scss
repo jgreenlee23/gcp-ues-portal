@@ -88,10 +88,52 @@
 }
 
 .wrapper > div {
-  padding: 1em;
   color: #d9480f;
-  border: 2px solid #ffa94d;
-  border-radius: 5px;
   background-color: #ffd8a8;
   cursor: pointer;
+  display: flex;
+  flex-flow: column;
+  text-align: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.25,0.8,0.25,1);
+}
+
+.wrapper.edit > div:hover {
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+  cursor: move;
+}
+
+.ui-icon-gripsmall-diagonal-se {
+    background-position: -64px -224px;
+}
+.ui-icon {
+    width: 16px;
+    height: 16px;
+    background-image: url(https://code.jquery.com/ui/1.9.2/themes/base/images/ui-icons_222222_256x240.png);
+    z-index: 1000;
+}
+.ui-resizable-se {
+    cursor: se-resize;
+    width: 12px;
+    height: 12px;
+    right: 1px;
+    bottom: 1px;
+}
+.ui-resizable-handle {
+    position: absolute;
+    font-size: 0.1px;
+    display: block;
+}
+.ui-icon {
+    display: block;
+    text-indent: -99999px;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    bottom: 0;
+    right: 0;
+    position: relative;
+    margin-top: auto;
+    align-self: flex-end;
 }
