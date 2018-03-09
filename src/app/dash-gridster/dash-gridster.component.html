@@ -1,0 +1,6 @@
+<gridster [options]="gridsterOptions" [draggableOptions]="{ handlerClass: 'panel-heading' }">
+
+  <gridster-item *ngFor="let widget of widgets" [(x)]="widget.x" [(y)]="widget.y" [(w)]="widget.w" [(h)]="widget.h">
+  </gridster-item>
+
+</gridster>
