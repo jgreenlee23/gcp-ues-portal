@@ -26,13 +26,13 @@
 </div> -->
 
 <!-- <div class="wrapper" (drop)="onDrop()" (dragover)="onDragOver()"> -->
-<div class="wrapper edit">
+<div class="wrapper edit" (mouseup)="cleanUp($event)">
    <!-- <div draggable="true" (dragstart)="startMove()">One -->
-   <div (mousedown)="startMove()">One
+   <div (mousedown)="startMove($event)">One
      <!-- <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1000;"></div> -->
    </div>
    <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Two</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Three</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)" (dragend)="onDragEnd($event)">Three</div>
    <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Four</div>
    <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Five</div>
    <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Six</div>

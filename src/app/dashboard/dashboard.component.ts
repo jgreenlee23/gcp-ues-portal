@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { BigQueryService } from '../bigquery.service';
+import * as html2canvas from "html2canvas";
 declare var jquery: any;
 declare var $: any;
+
+// TODO: add resizing
 
 @Component({
   selector: 'dashboard',
@@ -10,47 +13,79 @@ declare var $: any;
 })
 export class DashboardComponent implements OnInit {
 
-  elemPositionX: 0;
-  elemPositionY: 0;
-  elemHeight: 0;
-  elemWidth: 0;
-  isMouseDown: false;
-  myTimer: 0;
-  mousePosX: 0;
-  mousePosY: 0;
+  elemPositionX: number = 0;
+  elemPositionY: number = 0;
+  elemHeight: number = 0;
+  elemWidth: number = 0;
+  timer: number = 0;
+  mousePosX: number = 0;
+  mousePosY: number = 0;
+  isMouseDown: boolean = false;
+  hoverElement: HTMLImageElement;
+  serializedGrid: number[] = [];
 
   constructor() {
 
   }
 
   ngOnInit() {
+    this.serializedGrid = this.computeGrid();
+  }
+  
+  setCustomDragImage(event: any) {
+    // Clone computed style of dragged element to DragImage
+    var src = event.srcElement;
+    var dst = event.srcElement.cloneNode(true);
+    
+    var computedStyle;
+    if (typeof src.currentStyle != 'undefined') {
+      computedStyle = src.currentStyle;
+    } else {
+      computedStyle = document.defaultView.getComputedStyle(src, null);
+    }
+    
+    for (var i in computedStyle) {
+      if (typeof i == "string" && i != "cssText" && !/\d/.test(i)) {
+        try {
+          dst.style[i] = computedStyle[i];
+          if (i == "font") {
+            dst.style.fontSize = computedStyle.fontSize;
+          }
+        } catch (e) { }
+      }
+    }
+    
+    // TODO: custom styles go here (or should be imported as JSON object)
+    $(dst).addClass("dragImage");
+    dst.style.backgroundColor = "blue";
+    dst.style.transform = "translateX(-500px)";
+    
+    this.hoverElement = document.body.appendChild(dst);
+    event.dataTransfer.setDragImage(dst, dst.offsetWidth / 2, dst.offsetHeight / 2);
+  }
 
+  onDrag(event: any) {
+    // console.log(this.hoverElement);
+    // if (this.hoverElement !== undefined) {
+    //   console.log("setting drag image...");
+    //   event.dataTransfer.setDragImage(this.hoverElement, 0, 0);
+    // }
   }
 
   onDragStart(event: any) {
-    console.log("hello world..");
-    console.log(event);
-    
-    // TODO: stylize element being dropped
-    
-    // var crt = $(event.target).cloneNode(true);
-    // crt.style.backgroundColor = "red";
-    // crt.style.display = "none"; /* or visibility: hidden, or any of the above */
-    // document.body.appendChild(crt);
-    // event.dataTransfer.setDragImage($(event.target), 0, 0);
+    this.setCustomDragImage(event);
+    // TODO: remember origin point
+    // TODO: stylize origin element
+    // TODO: hide / remove element
   }
   
-  computeGrid() {
-    // TODO: loop through grid-components in wrapper; create serialiable JSON data representing grid
+  onDragEnd(event: any) {
+    
   }
 
   onDragOver(event: any) {
-    console.log(event);
-    console.log("dragging over...");
-    
-    // event.target.css("grid-column");
-    // event.target.css("grid-row");
-    
+    // console.log("dragover..");
+
     // TODO: get grid-column and grid-row from computeGrid array for event.target
     // TODO: create placeholder grid-component with dimensions (column x row) of event.target
     // TODO: remove previous grid-component (the one being dropped) to correctly show how components will be relocated
@@ -58,43 +93,60 @@ export class DashboardComponent implements OnInit {
   }
 
   onDrop(event: any) {
-    // event.preventDefault();
-    console.log("hello drop..");
+
     
     // TODO: get placeholder grid-component dimensions
     // TODO: place component being dropped 
   }
 
-  startMove() {
+  cleanUp(event: any) {
+    $('.dragImage').remove();
+  }
+
+  computeGrid() {
+    // TODO: Add component / widget reference to JSON object
+    // TODO: Add save functionality (persist to MongoDB) - requires REST API Endpoint and DashboardService
+    // TODO: Rewrite JQuery as Native JS
+    var serialized = [];
+    var children = document.querySelector('.wrapper').children;
+    for (var i = 0; i < children.length; i++) {
+      var child = $(children[i]);
+      serialized.push({
+        index: i,
+        col: child.css("grid-column"),
+        row: child.css("grid-row"),
+        colStart: child.css("grid-column-start"),
+        colEnd: child.css("grid-column-end"),
+        rowStart: child.css("grid-row-start"),
+        rowEnd: child.css("grid-row-end")
+      });
+    }
+    console.log(serialized);
+    return serialized;
+  }
+
+  startMove(event: any) {
     var $target = $(event.target);
 
-    // Set position mouse clicked in element for tracking //
     this.elemPositionX = event.pageX - $target.offset().left;
     this.elemPositionY = event.pageY - $target.offset().top;
     this.isMouseDown = true;
 
     // disable element highlighting
     $("body").children().css("user-select", "none");
-
-    // Set margin next to sibling so open space where item will currently go //
-    // if ($target.next().length) {
-    //   $target.next().css("margin-left", $target.width());
-    // } else {
-    //   $target.prev().css("margin-left", $target.width());
-    // }
-
     $('.wrapper').removeClass('edit');
     $target.addClass("moving");
+    
     this.elemWidth = $target.width();
     this.elemHeight = $target.height();
-    
+
     document.addEventListener("mouseup", this.finishMovingItem.bind(this), false);
     document.addEventListener('mousemove', this.onMouseUpdate.bind(this), false);
     document.addEventListener('mouseenter', this.onMouseUpdate.bind(this), false);
-    
-    this.myTimer = setInterval(function() {
+
+    this.timer = setInterval(function() {
       if (this.isMouseDown) {
-    
+
         // set moving item to track mouse movement
         $('.moving').css({
           "position": "absolute",
@@ -104,6 +156,7 @@ export class DashboardComponent implements OnInit {
           "width": this.elemWidth,
           // "box-shadow": "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
         });
+
         // Set tracking over sibling elements
         // $target.siblings(".movable").on("mouseover", function(siblingEvent){
         //     var siblingMiddle = ($(this).width() + parseInt($(this).css("padding-right")) + parseInt($(this).css("padding-left")) + 2) / 2;
@@ -119,29 +172,40 @@ export class DashboardComponent implements OnInit {
         //         $(this).css("margin-right", "10px");
         //     }
         // });
-    
+
       }
-    }.bind(this), 10);
+    }.bind(this), 100);
   }
-  
+
   finishMovingItem() {
     document.removeEventListener("mouseup", this.finishMovingItem, false);
     document.removeEventListener('mousemove', this.onMouseUpdate, false);
     document.removeEventListener('mouseenter', this.onMouseUpdate, false);
-    clearInterval(this.myTimer);
-    this.mouseDown = false;
+    clearInterval(this.timer);
+    this.isMouseDown = false;
   }
-
-  moveItem(event: any) {
-    var $target = this.model.get("$targetEl");
-
-    // set position of moving item  based on mouse position //
-    $target.css("left", (event.pageX - $(window).scrollLeft() - this.model.get("elemPositionX")) + "px");
-    $target.css("top", (event.pageY - $(window).scrollTop() - this.model.get("elemPositionY")) + "px");
-  },
 
   onMouseUpdate(e) {
-      this.mousePosX = e.pageX;
-      this.mousePosY = e.pageY;
+    this.mousePosX = e.pageX;
+    this.mousePosY = e.pageY;
+    // $('.moving').css({
+    //   "position": "absolute",
+    //   "left": (this.mousePosX - $(window).scrollLeft() - this.elemPositionX) + "px",
+    //   "top": (this.mousePosY - $(window).scrollTop() - this.elemPositionY) + "px",
+    //   "height": this.elemHeight,
+    //   "width": this.elemWidth,
+    //   // "box-shadow": "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
+    // });
   }
+  
+  // html2canvas(event.toElement).then(canvas => {
+  //   console.log("document successfully converted to image");
+  //   var imgURL = canvas.toDataURL("image/png");
+  //   var elem = document.createElement("img");
+  //   elem.src = imgURL;
+  //   elem.style.outline = "blue 1px solid";
+  //   document.body.appendChild(elem);
+  //   this.hoverElement = elem;
+  //   event.dataTransfer.setDragImage(elem, 0, 0);
+  // });
 }
