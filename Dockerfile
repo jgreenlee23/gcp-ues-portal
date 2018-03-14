@@ -1,22 +1,46 @@
-FROM node:carbon
-WORKDIR /home/jgreenlee25/Documents/Masergy/gcp-ues-portal/
+# FROM node:carbon
+# WORKDIR 
+# 
+# # INSTRUCTIONS:
+# # sudo docker run -d -p 80:80 --name webserver nginx
+# # sudo docker build -t gcr.io/soteria-portal/gcp-ues-portal:v1 .
+# # sudo docker run --rm -p 8080:8080 gcr.io/soteria-portal/gcp-ues-portal:v1
+# 
+# # Install app dependencies
+# COPY package*.json ./
+# COPY .angular-cli.json ./
+# 
+# RUN npm install
+# 
+# # If you are building your code for production
+# # RUN npm install --only=production
+# 
+# # Bundle app source
+# COPY . .
+# 
+# EXPOSE 8080
+# CMD [ "npm", "start" ]
 
-# INSTRUCTIONS:
-# sudo docker run -d -p 80:80 --name webserver nginx
-# sudo docker build -t gcr.io/soteria-portal/gcp-ues-portal:v1 .
-# sudo docker run --rm -p 8080:8080 gcr.io/soteria-portal/gcp-ues-portal:v1
+# Stage 0
+FROM node:8.9 as node
 
-# Install app dependencies
-COPY package*.json ./
-COPY .angular-cli.json ./
+WORKDIR /app
+
+COPY package.json /app/
 
 RUN npm install
 
-# If you are building your code for production
-# RUN npm install --only=production
+COPY ./ /app/
 
-# Bundle app source
-COPY . .
+ARG env=prod
 
-EXPOSE 8080
-CMD [ "npm", "start" ]
+RUN npm run build -- --prod --environment $env
+
+
+# Stage 1
+
+FROM nginx:1.13
+
+COPY --from=node /app/dist/ /usr/share/nginx/html
+
+COPY ./nginx/default.conf /etc/nginx/conf.d/default.conf

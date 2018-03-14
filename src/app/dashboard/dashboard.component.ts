@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { BigQueryService } from '../bigquery.service';
-import * as html2canvas from "html2canvas";
 declare var jquery: any;
 declare var $: any;
 
