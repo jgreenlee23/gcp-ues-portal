@@ -26,20 +26,18 @@
 </div> -->
 
 <!-- <div class="wrapper" (drop)="onDrop()" (dragover)="onDragOver()"> -->
-<div class="wrapper edit" (mouseup)="cleanUp($event)">
+<div id="wrapper" class="wrapper edit" (mouseup)="cleanUp($event)" (drop)="onDrop($event)" (dragover)="onDragOver($event)" (dragend)="onDragEnd($event)">
    <!-- <div draggable="true" (dragstart)="startMove()">One -->
-   <div (mousedown)="startMove($event)">One
-     <!-- <div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 1000;"></div> -->
-   </div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Two</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)" (dragend)="onDragEnd($event)">Three</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Four</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Five</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Six</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Seven</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Eight</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Nine</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Ten</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Eleven</div>
-   <div draggable="true" (dragstart)="onDragStart($event)" (dragover)="onDragOver($event)">Twelve</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">One</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Two</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Three</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Four</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Five</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Six</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Seven</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Eight</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Nine</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Ten</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Eleven</div>
+   <div draggable="true" (dragstart)="onDragStart($event)" (drop)="onDrop($event)">Twelve</div>
 </div>

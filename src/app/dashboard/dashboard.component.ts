@@ -6,6 +6,14 @@ declare var $: any;
 
 // TODO: add resizing
 
+type GridCoord = {
+  i: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
 @Component({
   selector: 'dashboard',
   templateUrl: './dashboard.component.html',
@@ -13,23 +21,23 @@ declare var $: any;
 })
 export class DashboardComponent implements OnInit {
 
-  elemPositionX: number = 0;
-  elemPositionY: number = 0;
-  elemHeight: number = 0;
-  elemWidth: number = 0;
-  timer: number = 0;
-  mousePosX: number = 0;
-  mousePosY: number = 0;
-  isMouseDown: boolean = false;
   hoverElement: HTMLImageElement;
-  serializedGrid: number[] = [];
+  serializedGrid: GridCoord[];
+  trackWidth: number = 0;
+  trackHeight: number = 0;
+  colgutter: number = 0;
+  rowgutter: number = 0;
+  containerRect: ClientRect;
+  placeholderElem: HTMLDivElement;
+  originElem: Element;
 
   constructor() {
 
   }
 
   ngOnInit() {
-    this.serializedGrid = this.computeGrid();
+    this.computeGrid();
+    this.computeFixedGrid();
   }
   
   setCustomDragImage(event: any) {
@@ -57,7 +65,7 @@ export class DashboardComponent implements OnInit {
     
     // TODO: custom styles go here (or should be imported as JSON object)
     $(dst).addClass("dragImage");
-    dst.style.backgroundColor = "blue";
+    // dst.style.backgroundColor = "blue";
     dst.style.transform = "translateX(-500px)";
     
     this.hoverElement = document.body.appendChild(dst);
@@ -73,33 +81,73 @@ export class DashboardComponent implements OnInit {
   }
 
   onDragStart(event: any) {
+    $(event.srcElement).attr('style', 'visibility: hidden');
+    this.originElem = event.srcElement;
     this.setCustomDragImage(event);
+    
     // TODO: remember origin point
     // TODO: stylize origin element
     // TODO: hide / remove element
   }
   
   onDragEnd(event: any) {
+    console.log("dragend...");
+    var attrs = this.getGridAttributes(this.placeholderElem);
+    var obj = document.createElement('div');
+    var arr = new Array();
+    for (var key in attrs) {
+      if (key != "i") {
+        arr.push(key + ':' + attrs[key]);
+      }
+    }
+    
+    obj.setAttribute('style', arr.join(';'));
+    this.placeholderElem.parentNode.removeChild(this.placeholderElem);
+    this.placeholderElem = null;
+    $(obj).appendTo('.wrapper');
+    // event.preventDefault();
     
   }
 
   onDragOver(event: any) {
-    // console.log("dragover..");
-
-    // TODO: get grid-column and grid-row from computeGrid array for event.target
-    // TODO: create placeholder grid-component with dimensions (column x row) of event.target
-    // TODO: remove previous grid-component (the one being dropped) to correctly show how components will be relocated
+    console.log("dragover..");
+    event = event || window.event;
+    var dragX = event.pageX, dragY = event.pageY;
     
+    var x = Math.floor((dragX - this.containerRect.left) / (this.trackWidth + this.colgutter)); 
+    var y = Math.floor(((dragY - this.containerRect.top) / (this.trackHeight + this.rowgutter) * 100));
+    
+    if (this.placeholderElem == undefined) {
+      var attrs = this.getGridAttributes(this.originElem);
+      var obj = document.createElement('div');
+      var arr = new Array();
+      for (var key in attrs) {
+        if (key != "i") {
+          arr.push(key + ':' + attrs[key]);
+        }
+      }
+      
+      obj.setAttribute('style', arr.join(';'));
+      $(obj).appendTo('.wrapper');
+      this.placeholderElem = obj;
+      this.placeholderElem.style['background-color'] = 'lightgrey';
+      
+    } else {
+      var index = Array.from(document.querySelector('.wrapper').children).indexOf(this.originElem);
+      console.log(this.serializedGrid[index]);
+      this.placeholderElem.style['grid-column-start'] = x + 1;
+      this.placeholderElem.style['grid-column-end'] = x + 1 + this.serializedGrid[index].w;
+      this.placeholderElem.style['grid-row-start'] = y + 1;
+      this.placeholderElem.style['grid-row-end'] = y + 1 + this.serializedGrid[index].h;
+    }
   }
 
   onDrop(event: any) {
 
-    
-    // TODO: get placeholder grid-component dimensions
-    // TODO: place component being dropped 
   }
 
   cleanUp(event: any) {
+    console.log("mouseup");
     $('.dragImage').remove();
   }
 
@@ -124,88 +172,63 @@ export class DashboardComponent implements OnInit {
     console.log(serialized);
     return serialized;
   }
+  
+  computeFixedGrid() {
+    var serialized = [];
 
-  startMove(event: any) {
-    var $target = $(event.target);
+    // calculate container size
+    var wrap = document.getElementById('wrapper');
+    var rect = wrap.getBoundingClientRect();
+    var colgutter = getComputedStyle(wrap)['grid-column-gap'].slice(0, -2);
+    var rowgutter = getComputedStyle(wrap)['grid-row-gap'].slice(0, -2);
 
-    this.elemPositionX = event.pageX - $target.offset().left;
-    this.elemPositionY = event.pageY - $target.offset().top;
-    this.isMouseDown = true;
-
-    // disable element highlighting
-    $("body").children().css("user-select", "none");
-    $('.wrapper').removeClass('edit');
-    $target.addClass("moving");
+    // calculate track size
+    var firstChild = $(wrap).children()[0];
+    var rec2 = firstChild.getBoundingClientRect();
+    var attrs = this.getGridAttributes(firstChild);
+    var trackWidth = 0, trackHeight = 0;
     
-    this.elemWidth = $target.width();
-    this.elemHeight = $target.height();
-
-    document.addEventListener("mouseup", this.finishMovingItem.bind(this), false);
-    document.addEventListener('mousemove', this.onMouseUpdate.bind(this), false);
-    document.addEventListener('mouseenter', this.onMouseUpdate.bind(this), false);
-
-    this.timer = setInterval(function() {
-      if (this.isMouseDown) {
-
-        // set moving item to track mouse movement
-        $('.moving').css({
-          "position": "absolute",
-          "left": (this.mousePosX - $(window).scrollLeft() - this.elemPositionX) + "px",
-          "top": (this.mousePosY - $(window).scrollTop() - this.elemPositionY) + "px",
-          "height": this.elemHeight,
-          "width": this.elemWidth,
-          // "box-shadow": "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
-        });
-
-        // Set tracking over sibling elements
-        // $target.siblings(".movable").on("mouseover", function(siblingEvent){
-        //     var siblingMiddle = ($(this).width() + parseInt($(this).css("padding-right")) + parseInt($(this).css("padding-left")) + 2) / 2;
-        // 
-        //     $(this).siblings(":not('.moving')").removeAttr("style");
-        //     if(siblingEvent.offsetX > siblingMiddle){
-        //         self.model.set("moveItemTo", {$sibling: $(this), "position": "after"});
-        //         $(this).css("margin-right", $target.width());
-        //         $(this).css("margin-left", "10px");
-        //     } else {
-        //         self.model.set("moveItemTo", {$sibling: $(this), "position": "before"});
-        //         $(this).css("margin-left", $target.width());
-        //         $(this).css("margin-right", "10px");
-        //     }
-        // });
-
-      }
-    }.bind(this), 100);
-  }
-
-  finishMovingItem() {
-    document.removeEventListener("mouseup", this.finishMovingItem, false);
-    document.removeEventListener('mousemove', this.onMouseUpdate, false);
-    document.removeEventListener('mouseenter', this.onMouseUpdate, false);
-    clearInterval(this.timer);
-    this.isMouseDown = false;
-  }
-
-  onMouseUpdate(e) {
-    this.mousePosX = e.pageX;
-    this.mousePosY = e.pageY;
-    // $('.moving').css({
-    //   "position": "absolute",
-    //   "left": (this.mousePosX - $(window).scrollLeft() - this.elemPositionX) + "px",
-    //   "top": (this.mousePosY - $(window).scrollTop() - this.elemPositionY) + "px",
-    //   "height": this.elemHeight,
-    //   "width": this.elemWidth,
-    //   // "box-shadow": "0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22)"
-    // });
+    if (attrs.colStart == "auto" || attrs.colEnd == "auto") {
+      trackHeight = rec2.height;
+    } else {
+      trackHeight = rec2.height / (attrs.colEnd - attrs.colStart);
+    }
+    
+    if (attrs.rowStart == "auto" || attrs.rowEnd == "auto") {
+      trackWidth = rec2.width;
+    } else {
+      trackWidth = rec2.width / (attrs.rowEnd - attrs.rowStart);
+    }
+    
+    var children = document.querySelector('.wrapper').children;
+    for (var i = 0; i < children.length; i++) {
+      var childRect = children[i].getBoundingClientRect();
+      serialized.push({
+        i: i,
+        x: Math.floor((childRect.left - rect.left) / (trackWidth + colgutter)),
+        y: Math.floor(((childRect.top - rect.top) / (trackHeight + rowgutter) * 100)),
+        h: Math.floor(childRect.height / trackHeight),
+        w: Math.floor(childRect.width / trackWidth)
+      });
+    }
+    
+    console.log(serialized);
+    this.serializedGrid = serialized;
+    this.trackWidth = trackWidth;
+    this.trackHeight = trackHeight;
+    this.colgutter = colgutter;
+    this.rowgutter = rowgutter;
+    this.containerRect = rect;
   }
   
-  // html2canvas(event.toElement).then(canvas => {
-  //   console.log("document successfully converted to image");
-  //   var imgURL = canvas.toDataURL("image/png");
-  //   var elem = document.createElement("img");
-  //   elem.src = imgURL;
-  //   elem.style.outline = "blue 1px solid";
-  //   document.body.appendChild(elem);
-  //   this.hoverElement = elem;
-  //   event.dataTransfer.setDragImage(elem, 0, 0);
-  // });
+  getGridAttributes(elem: Element) {
+    return {
+      col: getComputedStyle(elem)["grid-column"],
+      row: getComputedStyle(elem)["grid-row"],
+      colStart: getComputedStyle(elem)["grid-column-start"],
+      colEnd: getComputedStyle(elem)["grid-column-end"],
+      rowStart: getComputedStyle(elem)["grid-row-start"],
+      rowEnd: getComputedStyle(elem)["grid-row-end"],
+    }
+  }
 }
